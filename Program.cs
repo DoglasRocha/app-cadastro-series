@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace Series
@@ -64,10 +63,6 @@ namespace Series
                     Console.WriteLine(print);
                 }
             }
-
-            /* Serie serie = repository.ReturnById(serieIndex);
-
-            Console.WriteLine(serie); */
         }
 
         private static void RemoveSerie()
@@ -76,7 +71,6 @@ namespace Series
             int serieIndex = int.Parse(Console.ReadLine());
 
             databaseMessager.Delete(serieIndex);
-            // repository.Remove(serieIndex);
         }
 
         private static void UpdateSerie()
@@ -84,66 +78,22 @@ namespace Series
             Console.Write("Digite o id da série: ");
             int serieId = int.Parse(Console.ReadLine());
 
-            foreach (int i in Enum.GetValues(typeof(Genre)))
-            {
-                Console.WriteLine($"{i} - {Enum.GetName(typeof(Genre), i)}");
-            }
+            string[] serieData = GetSerieData();
 
-            Console.Write("Digite o gênero entre as opções acima: ");
-            int genreInput = int.Parse(Console.ReadLine());
-
-            Console.Write("Digite o título da Série: ");
-            string titleInput = Console.ReadLine();
-
-            Console.Write("Digite o ano de início da série: ");
-            int yearInput = int.Parse(Console.ReadLine());
-
-            Console.Write("Digite a descrição da série: ");
-            string descriptionInput = Console.ReadLine();
-
-            databaseMessager.Update(serieId, (Genre)genreInput, titleInput,
-                                    descriptionInput, yearInput, false);
-
-            /* Serie updatedSerie = new Serie(id: serieId,
-                                           genre: (Genre)genreInput,
-                                           title: titleInput,
-                                           year: yearInput,
-                                           description: descriptionInput);
-        
-            repository.Update(serieId, updatedSerie); */
+            databaseMessager.Update(id: serieId, genre: (Genre)int.Parse(serieData[0]), 
+                                    title: serieData[1], description: serieData[3],
+                                    year: int.Parse(serieData[2]), removed: false);
         }
 
         private static void InsertSerie()
         {
             Console.WriteLine("Inserir nova série");
 
-            foreach (int i in Enum.GetValues(typeof(Genre)))
-            {
-                Console.WriteLine($"{i} - {Enum.GetName(typeof(Genre), i)}");
-            }
+            string[] serieData = GetSerieData();
 
-            Console.Write("Digite o gênero entre as opções acima: ");
-            int genreInput = int.Parse(Console.ReadLine());
-
-            Console.Write("Digite o título da Série: ");
-            string titleInput = Console.ReadLine();
-
-            Console.Write("Digite o ano de início da série: ");
-            int yearInput = int.Parse(Console.ReadLine());
-
-            Console.Write("Digite a descrição da série: ");
-            string descriptionInput = Console.ReadLine();
-
-            databaseMessager.Insert((Genre)genreInput, titleInput, descriptionInput,
-                                    yearInput, false);
-
-            /* Serie newSerie = new Serie(id: repository.NextId(),
-                                       genre: (Genre)genreInput,
-                                       title: titleInput,
-                                       year: yearInput,
-                                       description: descriptionInput);
-
-            repository.Insert(newSerie); */
+            databaseMessager.Insert(genre: (Genre)int.Parse(serieData[0]), title: serieData[1], 
+                                    description: serieData[3], year: int.Parse(serieData[2]), 
+                                    removed: false);
         }
 
         private static void ListSeries()
@@ -165,23 +115,7 @@ namespace Series
                 }
 
                 if (iterations == 0) Console.WriteLine("Nenhuma série cadastrada");
-
             }
-            
-            /* List<Serie> list = repository.List();
-
-            if (list.Count == 0)
-            {
-                Console.WriteLine("Nenhuma série cadastrada");
-                return;
-            }
-
-            foreach (Serie serie in list)
-            {
-                bool removed = serie.returnRemoved();
-
-                Console.WriteLine($"# ID {serie.returnId()}: - {serie.returnTitle()} - {(removed ? "Excluído" : "")}");
-            } */
         }
 
         private static string GetUserOption()
@@ -204,5 +138,33 @@ namespace Series
 
             return userOption;
         }
+
+        private static string[] GetSerieData()
+        {
+            string[] array = new string[4];
+
+            foreach (int i in Enum.GetValues(typeof(Genre)))
+            {
+                Console.WriteLine($"{i} - {Enum.GetName(typeof(Genre), i)}");
+            }
+
+            Console.Write("Digite o gênero entre as opções acima: ");
+            int genreInput = int.Parse(Console.ReadLine());
+            array[0] = genreInput.ToString();
+
+            Console.Write("Digite o título da Série: ");
+            string titleInput = Console.ReadLine();
+            array[1] = titleInput;
+
+            Console.Write("Digite o ano de início da série: ");
+            int yearInput = int.Parse(Console.ReadLine());
+            array[2] = yearInput.ToString();
+
+            Console.Write("Digite a descrição da série: ");
+            string descriptionInput = Console.ReadLine();   
+            array[3] = descriptionInput;
+
+            return array;
+        } 
     }
 }
