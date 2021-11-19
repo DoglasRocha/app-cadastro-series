@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 
 namespace Series
 {
@@ -10,14 +11,7 @@ namespace Series
         
         static void Main()
         {
-            //databaseMessager.Insert((Genre)1, "lalala", "lalalala", 2018, false);
-            //Console.WriteLine(databaseMessager.Select().ToString());
-            Console.WriteLine(databaseMessager.SelectWhere(4));
-            databaseMessager.Update(4, (Genre)1, "lalala", "lalalalala", 2018, false);
-            databaseMessager.Delete(5);
-            Console.WriteLine(databaseMessager.SelectWhere(4));
-
-            /* string userOption = GetUserOption();
+            string userOption = GetUserOption();
 
             while (userOption != "X")
             {
@@ -48,7 +42,7 @@ namespace Series
                 }
 
                 userOption = GetUserOption();
-            } */
+            } 
         }
 
         private static void ShowSerie()
@@ -56,9 +50,24 @@ namespace Series
             Console.Write("Digite o id da série: ");
             int serieIndex = int.Parse(Console.ReadLine());
 
-            Serie serie = repository.ReturnById(serieIndex);
+            using(SqlDataReader serie = databaseMessager.SelectWhere(serieIndex))
+            {
+                while (serie.Read())
+                {
+                    string print = "";
+                    print += $"Gênero: {serie.GetValue(1)}" + Environment.NewLine;
+                    print += $"Título: {serie.GetValue(2)}" + Environment.NewLine;
+                    print += $"Descrição: {serie.GetValue(3)}" + Environment.NewLine;
+                    print += $"Ano: {serie.GetValue(4)}" + Environment.NewLine;
+                    print += $"Removido: {(serie.GetValue(5))}" + Environment.NewLine;
 
-            Console.WriteLine(serie);
+                    Console.WriteLine(print);
+                }
+            }
+
+            /* Serie serie = repository.ReturnById(serieIndex);
+
+            Console.WriteLine(serie); */
         }
 
         private static void RemoveSerie()
@@ -66,7 +75,8 @@ namespace Series
             Console.Write("Digite o id da série: ");
             int serieIndex = int.Parse(Console.ReadLine());
 
-            repository.Remove(serieIndex);
+            databaseMessager.Delete(serieIndex);
+            // repository.Remove(serieIndex);
         }
 
         private static void UpdateSerie()
@@ -91,13 +101,16 @@ namespace Series
             Console.Write("Digite a descrição da série: ");
             string descriptionInput = Console.ReadLine();
 
-            Serie updatedSerie = new Serie(id: serieId,
+            databaseMessager.Update(serieId, (Genre)genreInput, titleInput,
+                                    descriptionInput, yearInput, false);
+
+            /* Serie updatedSerie = new Serie(id: serieId,
                                            genre: (Genre)genreInput,
                                            title: titleInput,
                                            year: yearInput,
                                            description: descriptionInput);
         
-            repository.Update(serieId, updatedSerie);
+            repository.Update(serieId, updatedSerie); */
         }
 
         private static void InsertSerie()
@@ -121,20 +134,41 @@ namespace Series
             Console.Write("Digite a descrição da série: ");
             string descriptionInput = Console.ReadLine();
 
-            Serie newSerie = new Serie(id: repository.NextId(),
+            databaseMessager.Insert((Genre)genreInput, titleInput, descriptionInput,
+                                    yearInput, false);
+
+            /* Serie newSerie = new Serie(id: repository.NextId(),
                                        genre: (Genre)genreInput,
                                        title: titleInput,
                                        year: yearInput,
                                        description: descriptionInput);
 
-            repository.Insert(newSerie);
+            repository.Insert(newSerie); */
         }
 
         private static void ListSeries()
         {
             Console.WriteLine("Listar Séries");
+
+            using (SqlDataReader series = databaseMessager.Select())
+            {
+                int iterations = 0;
+
+                while (series.Read())
+                {
+                    bool isRemoved = (bool)series.GetValue(5);
+                    if (!isRemoved)
+                    {
+                        Console.WriteLine($"# ID {series.GetValue(0)}: - {series.GetValue(2)}");
+                        iterations++;
+                    }
+                }
+
+                if (iterations == 0) Console.WriteLine("Nenhuma série cadastrada");
+
+            }
             
-            List<Serie> list = repository.List();
+            /* List<Serie> list = repository.List();
 
             if (list.Count == 0)
             {
@@ -147,7 +181,7 @@ namespace Series
                 bool removed = serie.returnRemoved();
 
                 Console.WriteLine($"# ID {serie.returnId()}: - {serie.returnTitle()} - {(removed ? "Excluído" : "")}");
-            }
+            } */
         }
 
         private static string GetUserOption()

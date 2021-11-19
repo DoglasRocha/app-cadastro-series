@@ -9,4 +9,5 @@ CREATE TABLE Series (
     Removido BIT NOT NULL
 );
 
+use SeriesDB;
 select * from Series
