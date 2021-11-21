@@ -6,7 +6,7 @@ namespace Series
     class Program
     {
         static SeriesRepository repository = new SeriesRepository();
-        static DatabaseMessager databaseMessager = new DatabaseMessager();
+        static DatabaseMessenger databaseMessenger = new DatabaseMessenger();
         
         static void Main()
         {
@@ -49,20 +49,7 @@ namespace Series
             Console.Write("Digite o id da série: ");
             int serieIndex = int.Parse(Console.ReadLine());
 
-            using(SqlDataReader serie = databaseMessager.SelectWhere(serieIndex))
-            {
-                while (serie.Read())
-                {
-                    string print = "";
-                    print += $"Gênero: {serie.GetValue(1)}" + Environment.NewLine;
-                    print += $"Título: {serie.GetValue(2)}" + Environment.NewLine;
-                    print += $"Descrição: {serie.GetValue(3)}" + Environment.NewLine;
-                    print += $"Ano: {serie.GetValue(4)}" + Environment.NewLine;
-                    print += $"Removido: {(serie.GetValue(5))}" + Environment.NewLine;
-
-                    Console.WriteLine(print);
-                }
-            }
+            ProgramMessenger.GetSerieInformation(serieIndex);
         }
 
         private static void RemoveSerie()
@@ -70,7 +57,7 @@ namespace Series
             Console.Write("Digite o id da série: ");
             int serieIndex = int.Parse(Console.ReadLine());
 
-            databaseMessager.Delete(serieIndex);
+            ProgramMessenger.DeleteSerie(serieIndex);
         }
 
         private static void UpdateSerie()
@@ -80,9 +67,7 @@ namespace Series
 
             string[] serieData = GetSerieData();
 
-            databaseMessager.Update(id: serieId, genre: (Genre)int.Parse(serieData[0]), 
-                                    title: serieData[1], description: serieData[3],
-                                    year: int.Parse(serieData[2]), removed: false);
+            ProgramMessenger.UpdateSerie(serieId, serieData);
         }
 
         private static void InsertSerie()
@@ -91,31 +76,16 @@ namespace Series
 
             string[] serieData = GetSerieData();
 
-            databaseMessager.Insert(genre: (Genre)int.Parse(serieData[0]), title: serieData[1], 
-                                    description: serieData[3], year: int.Parse(serieData[2]), 
-                                    removed: false);
+            ProgramMessenger.InsertSerie(serieData);
         }
 
         private static void ListSeries()
         {
             Console.WriteLine("Listar Séries");
 
-            using (SqlDataReader series = databaseMessager.Select())
-            {
-                int iterations = 0;
+            string seriesList = ProgramMessenger.GetSeriesList();
 
-                while (series.Read())
-                {
-                    bool isRemoved = (bool)series.GetValue(5);
-                    if (!isRemoved)
-                    {
-                        Console.WriteLine($"# ID {series.GetValue(0)}: - {series.GetValue(2)}");
-                        iterations++;
-                    }
-                }
-
-                if (iterations == 0) Console.WriteLine("Nenhuma série cadastrada");
-            }
+            Console.WriteLine(seriesList);
         }
 
         private static string GetUserOption()
