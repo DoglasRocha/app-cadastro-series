@@ -8,6 +8,3 @@ CREATE TABLE Series (
     Ano INT NOT NULL,
     Removido BIT NOT NULL
 );
-
-use SeriesDB;
-select * from Series

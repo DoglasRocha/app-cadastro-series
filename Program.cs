@@ -49,7 +49,8 @@ namespace Series
             Console.Write("Digite o id da série: ");
             int serieIndex = int.Parse(Console.ReadLine());
 
-            ProgramMessenger.GetSerieInformation(serieIndex);
+            string serieInformation = ProgramMessenger.GetSerieInformation(serieIndex);
+            Console.WriteLine(serieInformation);
         }
 
         private static void RemoveSerie()
