@@ -13,7 +13,7 @@ namespace Series
         {
             SqlConnection connection;
 
-            connection = new SqlConnection("Server=localhost;Database=SeriesDB;User=SA;Password=SF90stradale");
+            connection = new SqlConnection("Server=localhost;Database=SeriesDB;User=SA;Password=****");
             connection.Open();
             
             return connection;
